@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block content %}
+<main>
+    <h2>Homeowner Summary</h2>
+
+    <!-- Bar Chart for Service Requests Summary -->
+    <section>
+        <h3>Service Requests</h3>
+        <div class="chart-container">
+            {% for status, count in zipped_data %}
+            <div class="bar-item">
+                <span class="label">{{ status }}</span>
+                <div class="bar">
+                    <span>{{ count }}</span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+</main>
+
+<style>
+    /* General styles */
+    main {
+        padding: 20px;
+        font-family: Arial, sans-serif;
+    }
+
+    h2, h3 {
+        text-align: center;
+        color: #333;
+    }
+
+    .chart-container {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .bar-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .label {
+        width: 150px;
+        text-align: right;
+        font-weight: bold;
+        color: #555;
+    }
+
+    .bar {
+        flex-grow: 1;
+        height: 25px;
+        background-color: #2196F3;
+        position: relative;
+        border-radius: 4px;
+        max-width: 100%;
+    }
+
+    .bar span {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: white;
+        font-size: 12px;
+        font-weight: bold;
+    }
+
+    .bar[style] {
+        transition: width 0.5s ease;
+    }
+</style>
+{% endblock %}

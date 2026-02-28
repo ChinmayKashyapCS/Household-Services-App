@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row mb-4">
+        <div class="col text-center">
+            <h1 class="fw-bold text-primary">Search Portal</h1>
+            <p class="text-muted">Easily search for Homeowners and Professionals</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Homeowner Section -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="card-title">Search Homeowners</h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST" class="mb-4">
+                        <input type="hidden" name="homeowner_search" value="true">
+                        <div class="mb-3">
+                            <label for="search_type_homeowner" class="form-label">Search Type</label>
+                            <select name="search_type_homeowner" id="search_type_homeowner" class="form-select" onchange="this.form.submit()" required>
+                                <option value="homeowner_id" {% if search_type_homeowner == 'homeowner_id' %}selected{% endif %}>Homeowner ID</option>
+                                <option value="username" {% if search_type_homeowner == 'username' %}selected{% endif %}>Username</option>
+                                <option value="address" {% if search_type_homeowner == 'address' %}selected{% endif %}>Address</option>
+                                <option value="pincode" {% if search_type_homeowner == 'pincode' %}selected{% endif %}>Pincode</option>
+                                <option value="email" {% if search_type_homeowner == 'email' %}selected{% endif %}>Email</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="search_query_homeowner" class="form-label">Search Query</label>
+                            <select name="search_query_homeowner" id="search_query_homeowner" class="form-select" required>
+                                {% for option in homeowner_options[search_type_homeowner] %}
+                                    <option value="{{ option }}">{{ option }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Search</button>
+                    </form>
+
+                    <table class="table table-striped table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Address</th>
+                                <th>Pincode</th>
+                                <th>Email</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for homeowner in filtered_homeowners %}
+                                <tr>
+                                    <td>{{ homeowner.user.user_id }}</td>
+                                    <td>{{ homeowner.user.username }}</td>
+                                    <td>{{ homeowner.user.address }}</td>
+                                    <td>{{ homeowner.user.pincode }}</td>
+                                    <td>{{ homeowner.user.email }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Professional Section -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h3 class="card-title">Search Professionals</h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST" class="mb-4">
+                        <input type="hidden" name="professional_search" value="true">
+                        <div class="mb-3">
+                            <label for="search_type_professional" class="form-label">Search Type</label>
+                            <select name="search_type_professional" id="search_type_professional" class="form-select" onchange="this.form.submit()" required>
+                                <option value="professional_id" {% if search_type_professional == 'professional_id' %}selected{% endif %}>Professional ID</option>
+                                <option value="username" {% if search_type_professional == 'username' %}selected{% endif %}>Username</option>
+                                <option value="address" {% if search_type_professional == 'address' %}selected{% endif %}>Address</option>
+                                <option value="pincode" {% if search_type_professional == 'pincode' %}selected{% endif %}>Pincode</option>
+                                <option value="email" {% if search_type_professional == 'email' %}selected{% endif %}>Email</option>
+                                <option value="service_name" {% if search_type_professional == 'service_name' %}selected{% endif %}>Service Name</option>
+                                <option value="service_id" {% if search_type_professional == 'service_id' %}selected{% endif %}>Service ID</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="search_query_professional" class="form-label">Search Query</label>
+                            <select name="search_query_professional" id="search_query_professional" class="form-select" required>
+                                {% for option in professional_options[search_type_professional] %}
+                                    <option value="{{ option }}">{{ option }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-success w-100">Search</button>
+                    </form>
+
+                    <table class="table table-striped table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Address</th>
+                                <th>Pincode</th>
+                                <th>Email</th>
+                                <th>Service Name</th>
+                                <th>Service ID</th>
+                                <th>Average Rating</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for professional in filtered_professionals %}
+                                <tr>
+                                    <td>{{ professional.user.user_id }}</td>
+                                    <td>{{ professional.user.username }}</td>
+                                    <td>{{ professional.user.address }}</td>
+                                    <td>{{ professional.user.pincode }}</td>
+                                    <td>{{ professional.user.email }}</td>
+                                    <td>{{ professional.service_name }}</td>
+                                    <td>{{ professional.service_id }}</td>
+                                    <td>{{ professional.avg_rating if professional.avg_rating else 'N/A' }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

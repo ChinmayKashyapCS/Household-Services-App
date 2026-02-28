@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block content %}
+<main>
+    <h2>Summary</h2>
+
+    <!-- Doughnut Chart for Overall Customer Ratings -->
+    <section>
+        <h3>Overall Customer Ratings</h3>
+        <div class="chart-container">
+            <div class="doughnut-chart">
+                <div class="circle" style="--rating: {{ avg_rating }};"></div>
+                <p>{{ avg_rating }} / 5</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Bar Chart for Service Requests Summary -->
+    <section>
+        <h3>Service Requests Summary</h3>
+        <div class="chart-container">
+            <div class="bar-chart">
+                {% for status, count in zipped_data %}
+                <div class="bar-item">
+                    <span class="label">{{ status }}</span>
+                    <div class="bar" style="--count: {{ count }};">
+                        <span>{{ count }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+</main>
+
+<style>
+    /* General styles */
+    main {
+        padding: 20px;
+        font-family: Arial, sans-serif;
+    }
+    h2, h3 {
+        text-align: center;
+        color: #333;
+    }
+    .chart-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 20px 0;
+    }
+
+    /* Doughnut chart styles */
+    .doughnut-chart {
+        position: relative;
+        width: 150px;
+        height: 150px;
+        margin-right: 20px;
+    }
+    .circle {
+        --size: 150px;
+        --rating: 3; /* Example value, will be overridden dynamically */
+        --percentage: calc((var(--rating) / 5) * 100);
+        width: var(--size);
+        height: var(--size);
+        background: conic-gradient(#4CAF50 calc(var(--percentage) * 1%), #ccc 0%);
+        border-radius: 50%;
+    }
+    .doughnut-chart p {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #333;
+    }
+
+    /* Bar chart styles */
+    .bar-chart {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .bar-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .label {
+        width: 100px;
+        text-align: right;
+        font-weight: bold;
+        color: #555;
+    }
+    .bar {
+        flex-grow: 1;
+        height: 20px;
+        background-color: #2196F3;
+        position: relative;
+        --max-width: 300px;
+        width: calc(var(--count) * 3px);
+        border-radius: 5px;
+    }
+    .bar span {
+        position: absolute;
+        right: 5px;
+        color: white;
+        font-size: 12px;
+        font-weight: bold;
+    }
+</style>
+{% endblock %}

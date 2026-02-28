@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Profile Button -->
+    <div class="d-flex justify-content-end mb-3">
+        <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#profileModal">
+            <i class="fas fa-user-edit"></i> Edit Profile
+        </button>
+    </div>
+
+    <!-- Profile Modal -->
+    <div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form method="POST">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title" id="profileModalLabel">Edit Profile</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="username" name="username" value="{{ homeowner.user.username }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" value="{{ homeowner.user.email }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="address" class="form-label">Address</label>
+                            <input type="text" class="form-control" id="address" name="address" value="{{ homeowner.user.address }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="pincode" class="form-label">Pincode</label>
+                            <input type="text" class="form-control" id="pincode" name="pincode" value="{{ homeowner.user.pincode }}" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Available Services Section -->
+    <div class="my-4">
+        <h2 class="text-center text-primary mb-4">Available Services</h2>
+        <div class="row g-4">
+            {% for service in services %}
+            <div class="col-md-4 col-lg-3">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body text-center">
+                        <h5 class="card-title text-primary">{{ service.service_name }}</h5>
+                        <p class="card-text text-muted">${{ service.base_price }}</p>
+                        <a href="{{ url_for('service_details', service_name=service.service_name) }}" class="btn btn-outline-primary">View Details</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Service History Section -->
+    <div class="mt-5">
+        <h4 class="text-primary mb-3">Your Service History</h4>
+        {% if service_history %}
+        <div class="table-responsive">
+            <table class="table table-hover table-bordered">
+                <thead class="table-primary">
+                    <tr>
+                        <th>Professional</th>
+                        <th>Status</th>
+                        <th>Rating</th>
+                        <th>Review</th>
+                        <th>Date Created</th>
+                        <th>Date Closed</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for request in service_history %}
+                    <tr>
+                        <td>{{ request.professional_name }}</td>
+                        <td>
+                            <span class="badge {% if request.service_status == 'Completed' %}bg-success{% elif request.service_status == 'Accepted' %}bg-warning text-dark{% else %}bg-secondary{% endif %}">
+                                {{ request.service_status }}
+                            </span>
+                        </td>
+                        <td>{{ request.rating_by_owner or 'N/A' }}</td>
+                        <td>{{ request.review_by_owner or 'N/A' }}</td>
+                        <td>{{ request.date_created }}</td>
+                        <td>{{ request.date_closed or 'Pending' }}</td>
+                        <td>
+                            {% if request.service_status == 'Accepted' %}
+                            <form method="POST" class="d-inline">
+                                <input type="hidden" name="close_service" value="1">
+                                <input type="hidden" name="request_id" value="{{ request.request_id }}">
+                                <div class="mb-2">
+                                    <label for="rating{{ request.request_id }}" class="form-label">Rating (1-5):</label>
+                                    <input type="number" id="rating{{ request.request_id }}" name="rating" min="1" max="5" step="0.1" class="form-control" required>
+                                </div>
+                                <div class="mb-2">
+                                    <label for="review{{ request.request_id }}" class="form-label">Review:</label>
+                                    <textarea id="review{{ request.request_id }}" name="review" rows="2" class="form-control" required></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-success btn-sm"><i class="fas fa-check"></i> Mark as Completed</button>
+                            </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="alert alert-info text-center">
+            <i class="fas fa-info-circle"></i> You have no service history yet.
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

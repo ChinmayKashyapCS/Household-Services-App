@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="text-center text-primary mb-4">Service Details</h1>
+
+    <!-- Service Details Section -->
+    <div class="card shadow-lg mb-4">
+        <div class="card-body">
+            <h2 class="card-title text-primary">{{ service.service_name }}</h2>
+            <p class="card-text text-muted">{{ service.service_description }}</p>
+            <hr>
+            <p class="mb-1"><strong>Price:</strong> <span class="text-success">${{ service.base_price }}</span></p>
+            <p class="mb-1"><strong>Average Service Rating:</strong> 
+                {% if avg_rating %}
+                    <span class="badge bg-success">{{ avg_rating | round(2) }}</span>
+                {% else %}
+                    <span class="badge bg-secondary">No ratings yet</span>
+                {% endif %}
+            </p>
+            <p class="mb-1"><strong>Time Required:</strong> {{ time_required }} hours</p>
+        </div>
+    </div>
+
+    <!-- Approved Professionals Section -->
+    {% if approved_professionals %}
+    <h4 class="text-primary">Approved Professionals</h4>
+    <div class="table-responsive mt-3">
+        <table class="table table-hover align-middle">
+            <thead class="table-primary">
+                <tr>
+                    <th>Name</th>
+                    <th>Experience</th>
+                    <th>Rating</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for professional in approved_professionals %}
+                <tr>
+                    <td>{{ professional.user.username }}</td>
+                    <td>{{ professional.experience }} years</td>
+                    <td>
+                        {% if professional.avg_rating %}
+                            <span class="badge bg-success">{{ professional.avg_rating | round(2) }}</span>
+                        {% else %}
+                            <span class="badge bg-secondary">No ratings yet</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <form method="POST">
+                            <input type="hidden" name="professional_id" value="{{ professional.professional_id }}">
+                            {% set existing_request = service_history | selectattr('professional_name', 'equalto', professional.user.username) | first %}
+                            {% if existing_request and existing_request.service_status in ['Pending', 'Accepted'] %}
+                                <button type="submit" class="btn btn-outline-secondary btn-sm" disabled>Booked</button>
+                            {% elif existing_request and existing_request.service_status == 'Completed' %}
+                                <button type="submit" class="btn btn-outline-primary btn-sm">Rebook</button>
+                            {% else %}
+                                <button type="submit" class="btn btn-outline-primary btn-sm">Book</button>
+                            {% endif %}
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="alert alert-warning text-center">
+        <i class="fas fa-exclamation-triangle"></i> No approved professionals available for this service.
+    </div>
+    {% endif %}
+
+    <!-- Service History Section -->
+    <h4 class="text-primary mt-5">Your Service History</h4>
+    {% if service_history %}
+    <div class="table-responsive mt-3">
+        <table class="table table-bordered table-hover align-middle">
+            <thead class="table-info">
+                <tr>
+                    <th>Request ID</th>
+                    <th>Professional</th>
+
+                    <th>Rating</th>
+                    <th>Review</th>
+                    <th>Date Created</th>
+                    <th>Date Closed</th>
+                    <th>Status</th>
+                    {% if request.service_status == 'Accepted' %}
+                        <th>Action</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for request in service_history %}
+                <tr>
+                    <td>{{ request.request_id }}</td>
+                    <td>{{ request.professional_name }}</td>
+
+                    <td>{{ request.rating_by_owner or 'N/A' }}</td>
+                    <td>{{ request.review_by_owner or 'N/A' }}</td>
+                    <td>{{ request.date_created }}</td>
+                    <td>{{ request.date_closed or 'Pending' }}</td>
+                    <td>
+                        <span class="badge {% if request.service_status == 'Completed' %}bg-success{% elif request.service_status == 'Accepted' %}bg-warning text-dark{% else %}bg-secondary{% endif %}">
+                            {{ request.service_status }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if request.service_status == 'Accepted' %}
+                        <form method="POST">
+                            <input type="hidden" name="close_service" value="1">
+                            <input type="hidden" name="request_id" value="{{ request.request_id }}">
+                            <div class="mb-2">
+                                <label for="rating{{ request.request_id }}" class="form-label">Rating (1-5):</label>
+                                <input type="number" id="rating{{ request.request_id }}" name="rating" min="1" max="5" step="0.1" class="form-control form-control-sm" required>
+                            </div>
+                            <div class="mb-2">
+                                <label for="review{{ request.request_id }}" class="form-label">Review:</label>
+                                <textarea id="review{{ request.request_id }}" name="review" rows="2" class="form-control form-control-sm" required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-success btn-sm"><i class="fas fa-check"></i> Mark as Completed</button>
+                        </form>
+                        {% endif %}
+                    </td>
+
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="alert alert-info text-center">
+        <i class="fas fa-info-circle"></i> You have no service history for this service.
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
